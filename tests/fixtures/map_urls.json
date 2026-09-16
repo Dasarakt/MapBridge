@@ -1,0 +1,146 @@
+[
+  {
+    "provider": "yandex",
+    "input": "https://yandex.com/maps/?ll=44.8015790%2C41.6935000&z=17",
+    "latitude": 41.6935,
+    "longitude": 44.801579
+  },
+  {
+    "provider": "yandex",
+    "input": "https://yandex.com/maps/?pt=42.3914689%2C42.4439724&z=17&l=map",
+    "latitude": 42.4439724,
+    "longitude": 42.3914689
+  },
+  {
+    "provider": "yandex",
+    "input": "https://yandex.ru/maps/?whatshere%5Bpoint%5D=44.8015790%2C41.6935000&whatshere%5Bzoom%5D=17",
+    "latitude": 41.6935,
+    "longitude": 44.801579
+  },
+  {
+    "provider": "apple",
+    "input": "https://maps.apple.com/?ll=41.6935000%2C44.8015790&q=41.6935000%2C44.8015790",
+    "latitude": 41.6935,
+    "longitude": 44.801579
+  },
+  {
+    "provider": "apple",
+    "input": "https://maps.apple.com/search?query=coffee&center=47.5951518%2C-122.3316393",
+    "latitude": 47.5951518,
+    "longitude": -122.3316393
+  },
+  {
+    "provider": "apple",
+    "input": "https://maps.apple.com/place?coordinate=42.4439724%2C42.3914689&name=hotel%20pillows",
+    "latitude": 42.4439724,
+    "longitude": 42.3914689
+  },
+  {
+    "provider": "twogis",
+    "input": "https://2gis.com/geo/42.3914689,42.4439724",
+    "latitude": 42.4439724,
+    "longitude": 42.3914689
+  },
+  {
+    "provider": "twogis",
+    "input": "https://2gis.ru/tbilisi/geo/44.8015790,41.6935000",
+    "latitude": 41.6935,
+    "longitude": 44.801579
+  },
+  {
+    "provider": "twogis",
+    "input": "https://2gis.ru/directions/points/37.531542,55.736291;70000001063199639|37.665247,55.759725;4504127912651411",
+    "latitude": 55.736291,
+    "longitude": 37.531542
+  },
+  {
+    "provider": "osm",
+    "input": "https://www.openstreetmap.org/?mlat=42.4439724&mlon=42.3914689#map=17/42.4439724/42.3914689",
+    "latitude": 42.4439724,
+    "longitude": 42.3914689
+  },
+  {
+    "provider": "osm",
+    "input": "https://www.openstreetmap.org/#map=17/41.6935000/44.8015790",
+    "latitude": 41.6935,
+    "longitude": 44.801579
+  },
+  {
+    "provider": "osm",
+    "input": "https://www.openstreetmap.org/search?query=47.5951518%2C-122.3316393",
+    "latitude": 47.5951518,
+    "longitude": -122.3316393
+  },
+  {
+    "provider": "waze",
+    "input": "https://waze.com/ul?ll=42.4439724%2C42.3914689&navigate=yes&zoom=17",
+    "latitude": 42.4439724,
+    "longitude": 42.3914689
+  },
+  {
+    "provider": "waze",
+    "input": "https://www.waze.com/ul?ll=41.6935000,44.8015790&z=10",
+    "latitude": 41.6935,
+    "longitude": 44.801579
+  },
+  {
+    "provider": "organic_maps",
+    "input": "https://omaps.app/map?v=1&ll=42.4439724%2C42.3914689&n=hotel+pillows",
+    "latitude": 42.4439724,
+    "longitude": 42.3914689
+  },
+  {
+    "provider": "organic_maps",
+    "input": "https://omaps.app/map?v=1&ll=41.6935000,44.8015790",
+    "latitude": 41.6935,
+    "longitude": 44.801579
+  },
+  {
+    "provider": "mapsme",
+    "input": "https://dlink.maps.me/map?v=1&ll=42.4439724%2C42.3914689&n=hotel+pillows",
+    "latitude": 42.4439724,
+    "longitude": 42.3914689
+  },
+  {
+    "provider": "mapsme",
+    "input": "https://dlink.maps.me/route?sll=55.800800,37.532754&dll=55.760158,37.618756&type=vehicle",
+    "latitude": 55.760158,
+    "longitude": 37.618756
+  },
+  {
+    "provider": "here",
+    "input": "https://share.here.com/l/42.4439724,42.3914689?z=17&p=yes",
+    "latitude": 42.4439724,
+    "longitude": 42.3914689
+  },
+  {
+    "provider": "here",
+    "input": "https://share.here.com/l/41.6935000,44.8015790,Tbilisi?z=15",
+    "latitude": 41.6935,
+    "longitude": 44.801579
+  },
+  {
+    "provider": "here",
+    "input": "https://wego.here.com/?map=47.5951518,-122.3316393,16",
+    "latitude": 47.5951518,
+    "longitude": -122.3316393
+  },
+  {
+    "provider": "osmand",
+    "input": "https://osmand.net/map/?pin=42.4439724,42.3914689#17/42.4439724/42.3914689",
+    "latitude": 42.4439724,
+    "longitude": 42.3914689
+  },
+  {
+    "provider": "osmand",
+    "input": "https://osmand.net/map/#17/41.6935000/44.8015790",
+    "latitude": 41.6935,
+    "longitude": 44.801579
+  },
+  {
+    "provider": "osmand",
+    "input": "https://osmand.net/map/navigate/?start=52.236210,5.119629&finish=52.412472,4.855957&profile=car",
+    "latitude": 52.412472,
+    "longitude": 4.855957
+  }
+]

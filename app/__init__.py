@@ -1,0 +1,2 @@
+"""MapBridge application package."""
+

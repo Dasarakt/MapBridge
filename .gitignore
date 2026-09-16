@@ -1,0 +1,13 @@
+.env
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.py[cod]
+*.egg-info/
+*.sqlite3
+dist/
+build/
+.DS_Store
+mapbridge_codex_spec.md
