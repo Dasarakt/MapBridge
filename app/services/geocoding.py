@@ -34,17 +34,20 @@ class NominatimGeocoder(Geocoder):
         if not normalized_query:
             raise GeocodingError("geocoding query is empty")
 
-        async with httpx.AsyncClient(timeout=self._timeout_seconds) as client:
-            response = await client.get(
-                self._base_url,
-                params={
-                    "q": normalized_query,
-                    "format": "jsonv2",
-                    "limit": "1",
-                },
-                headers={"User-Agent": self._user_agent},
-            )
-            response.raise_for_status()
+        try:
+            async with httpx.AsyncClient(timeout=self._timeout_seconds) as client:
+                response = await client.get(
+                    self._base_url,
+                    params={
+                        "q": normalized_query,
+                        "format": "jsonv2",
+                        "limit": "1",
+                    },
+                    headers={"User-Agent": self._user_agent},
+                )
+                response.raise_for_status()
+        except (httpx.HTTPError, httpx.InvalidURL):
+            raise GeocodingError("Nominatim request failed") from None
 
         results = response.json()
         if not results:
@@ -83,20 +86,23 @@ class GooglePlacesGeocoder(Geocoder):
         if not self._api_key:
             raise GeocodingError("Google Places API key is not configured")
 
-        async with httpx.AsyncClient(
-            timeout=self._timeout_seconds,
-            transport=self._transport,
-        ) as client:
-            response = await client.post(
-                self._base_url,
-                json={"textQuery": normalized_query},
-                headers={
-                    "Content-Type": "application/json",
-                    "X-Goog-Api-Key": self._api_key,
-                    "X-Goog-FieldMask": "places.displayName,places.location",
-                },
-            )
-            response.raise_for_status()
+        try:
+            async with httpx.AsyncClient(
+                timeout=self._timeout_seconds,
+                transport=self._transport,
+            ) as client:
+                response = await client.post(
+                    self._base_url,
+                    json={"textQuery": normalized_query},
+                    headers={
+                        "Content-Type": "application/json",
+                        "X-Goog-Api-Key": self._api_key,
+                        "X-Goog-FieldMask": "places.displayName,places.location",
+                    },
+                )
+                response.raise_for_status()
+        except (httpx.HTTPError, httpx.InvalidURL):
+            raise GeocodingError("Google Places request failed") from None
 
         results = response.json().get("places", [])
         if not results:

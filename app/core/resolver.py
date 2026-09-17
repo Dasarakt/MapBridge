@@ -47,8 +47,11 @@ class RedirectResolver:
             transport=self._transport,
         ) as client:
             for _ in range(self._max_redirects + 1):
-                request = client.build_request("GET", current_url)
-                response = await client.send(request, stream=True)
+                try:
+                    request = client.build_request("GET", current_url)
+                    response = await client.send(request, stream=True)
+                except (httpx.HTTPError, httpx.InvalidURL):
+                    raise RedirectResolutionError("short URL request failed") from None
                 try:
                     if not response.is_redirect:
                         return str(response.url)
