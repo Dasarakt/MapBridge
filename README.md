@@ -55,7 +55,7 @@ a separate converter for every pair of services.
 - Personal map and navigation preferences
 - Per-chat settings for groups, supergroups, and channels
 - Configurable interface language
-- SQLite-backed settings persistence
+- PostgreSQL-backed settings persistence in Docker Compose
 - Docker and Docker Compose support
 - Multi-platform Docker images for `linux/amd64` and `linux/arm64`
 
@@ -179,7 +179,7 @@ dasarakt/mapbridge
 Pull the current release:
 
 ```bash
-docker pull dasarakt/mapbridge:0.1.0
+docker pull dasarakt/mapbridge:0.2.0
 ```
 
 Or pull the latest published image:
@@ -203,16 +203,26 @@ Clone the repository and create the environment file:
 cp .env.example .env
 ```
 
-Set at least:
+Set the Telegram token and PostgreSQL credentials in `.env`:
 
 ```env
 TELEGRAM_BOT_TOKEN=your-telegram-bot-token
+POSTGRES_DB=mapbridge
+POSTGRES_USER=mapbridge
+POSTGRES_PASSWORD=choose-a-strong-password
 ```
 
-Then start MapBridge:
+Compose constructs a password-free `DATABASE_URL` from the database name and
+user, and passes `POSTGRES_PASSWORD` to the driver separately. Leave
+`DATABASE_URL` empty in `.env` for Compose. The database is available only on
+the Compose network.
+
+Publish an image containing the PostgreSQL changes before deploying this
+Compose configuration. Then pull the current release and start MapBridge:
 
 ```bash
-docker compose up -d --build
+docker compose pull
+docker compose up -d
 ```
 
 View logs:
@@ -227,9 +237,14 @@ Stop the bot:
 docker compose down
 ```
 
-The current development Compose configuration builds MapBridge from the local
-source tree. Published Docker Hub images can be used directly when deploying
-MapBridge without a source build.
+Compose runs a one-time migration job before starting the bot. PostgreSQL data
+is stored in the `postgres-data` named volume and survives container recreation.
+`docker compose down -v` deletes that volume and its data.
+
+After publishing a new bot image, run `docker compose pull` and
+`docker compose up -d` again. For local image testing, build the image with
+`docker build -t dasarakt/mapbridge:latest .` and use a temporary Compose
+override without `pull_policy: always`.
 
 ## Running from Source
 
@@ -260,6 +275,12 @@ Set `TELEGRAM_BOT_TOKEN`, then run:
 python -m app
 ```
 
+Without `DATABASE_URL`, a source run uses the local SQLite database. If
+`DATABASE_URL` is set, start PostgreSQL and run `python -m app.db.migrate`
+before starting the bot. The Compose hostname `postgres` is only resolvable
+inside the Compose network; a source run needs a database URL reachable from
+the host. Keep the URL password-free and set `POSTGRES_PASSWORD` separately.
+
 ## Configuration
 
 MapBridge reads configuration from environment variables and automatically
@@ -269,7 +290,11 @@ loads a local `.env` file when present.
 | --- | :---: | --- |
 | `TELEGRAM_BOT_TOKEN` | Yes | Telegram Bot API token |
 | `LOG_LEVEL` | No | Application logging level |
-| `DATABASE_PATH` | No | Path to the SQLite settings database |
+| `DATABASE_PATH` | No | SQLite settings database path for local source runs without `DATABASE_URL` |
+| `DATABASE_URL` | Local PostgreSQL: yes | Password-free PostgreSQL URL for source runs; Compose sets this automatically |
+| `POSTGRES_DB` | No | PostgreSQL database name (defaults to `mapbridge`) |
+| `POSTGRES_USER` | No | PostgreSQL user (defaults to `mapbridge`) |
+| `POSTGRES_PASSWORD` | Docker: yes | PostgreSQL password |
 | `GOOGLE_PLACES_API_KEY` | No | Google Places API key for improved `share.google` resolution |
 
 Example:
@@ -323,6 +348,28 @@ Operators running their own MapBridge instance are responsible for the
 configuration, infrastructure, logs, backups, and any additional data
 collection they introduce.
 
+## Database Backup
+
+Back up the Compose PostgreSQL database to a local file:
+
+```bash
+docker compose exec -T postgres pg_dump -U mapbridge -d mapbridge -Fc > mapbridge.dump
+```
+
+To test a restore without changing the live database, start PostgreSQL under
+a separate Compose project, which creates a separate `postgres-data` volume:
+
+```bash
+docker compose -p mapbridge-restore up -d postgres
+docker compose -p mapbridge-restore exec -T postgres pg_restore --clean --if-exists -U mapbridge -d mapbridge < mapbridge.dump
+```
+
+These commands assume the default `POSTGRES_DB` and `POSTGRES_USER` values.
+Use your configured values if they differ. Stop the test project with
+`docker compose -p mapbridge-restore down`; add `-v` only when you intend to
+delete its test database. Existing SQLite settings are not imported
+automatically into PostgreSQL.
+
 ## Development
 
 Install development dependencies:
@@ -336,6 +383,11 @@ Run the test suite:
 ```bash
 pytest
 ```
+
+The PostgreSQL integration test runs when `TEST_DATABASE_URL` points to a
+disposable database named `mapbridge_test`; otherwise it is skipped. Set
+`TEST_POSTGRES_PASSWORD` separately if that database requires a password.
+Never point the test at the bot's live database.
 
 The Dockerfile also contains a dedicated `test` build stage.
 
@@ -361,9 +413,7 @@ infrastructure and deployment automation are still evolving.
 
 Near-term development includes:
 
-- PostgreSQL persistence for production deployments
-- versioned database migrations
-- database backup and restore procedures
+- optional one-time SQLite settings import
 - GitHub Actions CI
 - automated multi-platform Docker image publishing
 - production Docker Compose configuration

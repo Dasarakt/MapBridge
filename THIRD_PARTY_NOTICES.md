@@ -11,6 +11,7 @@ Each component remains subject to its own license and copyright notices.
 | HTTPX | BSD-3-Clause | https://github.com/encode/httpx |
 | Open Location Code | Apache-2.0 | https://github.com/google/open-location-code |
 | python-dotenv | BSD-3-Clause | https://github.com/theskumar/python-dotenv |
+| Psycopg | LGPL-3.0-only | https://github.com/psycopg/psycopg |
 
 MapBridge also uses transitive dependencies installed through the Python
 dependency graph. Those dependencies remain subject to their respective

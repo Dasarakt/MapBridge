@@ -23,7 +23,7 @@ class NominatimGeocoder(Geocoder):
         self,
         base_url: str = "https://nominatim.openstreetmap.org/search",
         timeout_seconds: float = 5.0,
-        user_agent: str = "MapBridgeBot/0.1",
+        user_agent: str = "MapBridgeBot/0.2",
     ) -> None:
         self._base_url = base_url
         self._timeout_seconds = timeout_seconds

@@ -3,7 +3,9 @@ import sqlite3
 from collections.abc import Iterable
 from pathlib import Path
 
+from app.db.connection import connect_postgres
 from app.db.models import ChatSettings, UserSettings
+from app.db.migrations import LATEST_SCHEMA_VERSION
 
 
 DEFAULT_PROVIDER_ORDER = (
@@ -25,12 +27,40 @@ DEFAULT_NAVIGATION_PROVIDER_ORDER = (
 
 
 class SettingsRepository:
-    def __init__(self, database_path: str = "mapbridge.sqlite3") -> None:
+    def __init__(
+        self,
+        database_path: str = "mapbridge.sqlite3",
+        *,
+        database_url: str = "",
+        database_password: str = "",
+    ) -> None:
         self._database_path = database_path
+        self._database_url = database_url
+        self._database_password = database_password
+        self._placeholder = "%s" if database_url else "?"
         self._initialized = False
 
     def initialize(self) -> None:
         if self._initialized:
+            return
+
+        if self._database_url:
+            with self._connect() as connection:
+                row = connection.execute(
+                    "SELECT to_regclass('public.schema_migrations') AS table_name"
+                ).fetchone()
+                if row["table_name"] is None:
+                    raise RuntimeError(
+                        "PostgreSQL schema is missing; run python -m app.db.migrate"
+                    )
+                row = connection.execute(
+                    "SELECT MAX(version) AS version FROM schema_migrations"
+                ).fetchone()
+                if row["version"] != LATEST_SCHEMA_VERSION:
+                    raise RuntimeError(
+                        "PostgreSQL schema is out of date; run python -m app.db.migrate"
+                    )
+            self._initialized = True
             return
 
         database_parent = Path(self._database_path).expanduser().parent
@@ -76,10 +106,10 @@ class SettingsRepository:
         self.initialize()
         with self._connect() as connection:
             row = connection.execute(
-                """
+                f"""
                 SELECT favorite_providers, favorite_navigation_providers, language_code
                 FROM user_settings
-                WHERE telegram_user_id = ?
+                WHERE telegram_user_id = {self._placeholder}
                 """,
                 (telegram_user_id,),
             ).fetchone()
@@ -186,10 +216,10 @@ class SettingsRepository:
         self.initialize()
         with self._connect() as connection:
             row = connection.execute(
-                """
+                f"""
                 SELECT favorite_providers, favorite_navigation_providers, language_code
                 FROM chat_settings
-                WHERE telegram_chat_id = ?
+                WHERE telegram_chat_id = {self._placeholder}
                 """,
                 (telegram_chat_id,),
             ).fetchone()
@@ -301,14 +331,14 @@ class SettingsRepository:
     def _upsert(self, settings: UserSettings) -> None:
         with self._connect() as connection:
             connection.execute(
-                """
+                f"""
                 INSERT INTO user_settings (
                     telegram_user_id,
                     favorite_providers,
                     favorite_navigation_providers,
                     language_code
                 )
-                VALUES (?, ?, ?, ?)
+                VALUES ({', '.join((self._placeholder,) * 4)})
                 ON CONFLICT(telegram_user_id) DO UPDATE SET
                     favorite_providers = excluded.favorite_providers,
                     favorite_navigation_providers = excluded.favorite_navigation_providers,
@@ -325,14 +355,14 @@ class SettingsRepository:
     def _upsert_chat(self, settings: ChatSettings) -> None:
         with self._connect() as connection:
             connection.execute(
-                """
+                f"""
                 INSERT INTO chat_settings (
                     telegram_chat_id,
                     favorite_providers,
                     favorite_navigation_providers,
                     language_code
                 )
-                VALUES (?, ?, ?, ?)
+                VALUES ({', '.join((self._placeholder,) * 4)})
                 ON CONFLICT(telegram_chat_id) DO UPDATE SET
                     favorite_providers = excluded.favorite_providers,
                     favorite_navigation_providers = excluded.favorite_navigation_providers,
@@ -346,7 +376,15 @@ class SettingsRepository:
                 ),
             )
 
-    def _connect(self) -> sqlite3.Connection:
+    def _connect(self):
+        if self._database_url:
+            from psycopg.rows import dict_row
+
+            return connect_postgres(
+                self._database_url,
+                self._database_password,
+                row_factory=dict_row,
+            )
         connection = sqlite3.connect(self._database_path)
         connection.row_factory = sqlite3.Row
         return connection
