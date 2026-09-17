@@ -424,6 +424,19 @@ Near-term development includes:
 - automated deployment and rollback workflow
 - additional input formats and map providers
 - further Telegram UX improvements
+- Telegram Inline Mode for sharing converted locations directly from other chats
+
+Localization roadmap:
+
+- English is the default and international fallback; Russian serves the bot's
+  initial audience of Russian-speaking expats. Both are supported today.
+- Add Georgian to support users in Georgia.
+- Consider Armenian and Serbian next, based on demand from expat communities.
+- Keep language selection independent of the Telegram app language, including
+  per-chat settings and an automatic option where applicable.
+- Make translations easy to extend as more languages and region-specific map
+  providers are added. Review user-facing text, settings, and examples for each
+  new locale.
 
 The provider architecture is designed to allow additional **View** and
 **Navigate** integrations without changing the core location model.
