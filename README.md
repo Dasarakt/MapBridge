@@ -332,8 +332,11 @@ an appropriate User-Agent, and comply with the service's usage policy.
 
 ## Privacy
 
-MapBridge stores Telegram user and chat identifiers required to associate
-settings with users and chats.
+See the [MapBridge Privacy Policy](PRIVACY.md) for details about data processing,
+external services, logging, and deletion requests.
+
+When preferences are changed, MapBridge stores Telegram user or chat
+identifiers to associate settings with users and chats.
 
 Stored preferences can include:
 
@@ -341,8 +344,9 @@ Stored preferences can include:
 - favorite map providers
 - favorite navigation providers
 
-MapBridge does not use submitted coordinates, map URLs, or Telegram Location
-messages as a location-history database.
+MapBridge does not use its settings database as a location-history database.
+Submitted locations may still appear in Telegram conversations and be sent to
+external services when resolving links or geocoding places.
 
 Operators running their own MapBridge instance are responsible for the
 configuration, infrastructure, logs, backups, and any additional data
