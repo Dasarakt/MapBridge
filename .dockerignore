@@ -8,4 +8,6 @@ __pycache__/
 *.egg-info/
 *.sqlite3
 .DS_Store
-
+.git/
+.github/
+mapbridge_codex_spec.md
